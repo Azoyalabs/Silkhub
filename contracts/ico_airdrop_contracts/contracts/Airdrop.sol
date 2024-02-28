@@ -6,34 +6,28 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./interfaces/IAirdrop.sol";
 
-enum AirdropStatus {
-    NotStarted,
-    Open
-}
 
-
-contract Airdrop is Ownable, IAirdrop {
-    uint256 public allocated;
-    uint256 public claimed;
+contract Airdrop is IAirdrop, Ownable {
+    enum AirdropStatus {
+        NotStarted,
+        Open
+    }
 
     ERC20 public airdropToken;
-
     uint256 public startTime;
 
-    bool private isFirstClaimHappened;
-
+    uint256 public claimed;
     mapping (address => uint) whitelist;
 
-    bool public isInitialized;
-
     error AirdropNotStarted(uint256 startTime, uint256 currentTime);
+
 
     constructor(address _token, uint256 _startTime) Ownable(msg.sender) {
         airdropToken = ERC20(_token);
         startTime = _startTime;
-
-        isFirstClaimHappened = true;
     }
+
+
 
     function setAllowance(address beneficiary, uint256 amount) external onlyOwner {
            whitelist[beneficiary] = amount;
@@ -60,9 +54,12 @@ contract Airdrop is Ownable, IAirdrop {
         airdropToken.transfer(msg.sender, amount);
     }
 
-    function isClaimable() external view returns (bool) {
-        return block.timestamp >= startTime;
-    } 
+    function getIsClaimableAndAmount(address user) external view returns (bool, uint) {
+        return (
+            getAirdropStatus() == AirdropStatus.Open,
+            whitelist[user]
+        );
+    }
 
     function getClaimableAmount(address target) external view returns (uint) {
         return whitelist[target];
@@ -77,10 +74,13 @@ contract Airdrop is Ownable, IAirdrop {
     }
 
     /// Returns the following data:
-    /// Airdrop status - AirdropStatus
-    /// token address - address
-    /// start time - uint256
-    /// remaining to claim - uint256
+    /**
+     * 
+     * @return Airdrop status - AirdropStatus
+     * @return token address - address
+     * @return start time - uint256
+     * @return remaining to claim - uint256
+     */
     function getOverview() public view returns (AirdropStatus, address, uint256, uint256) {
         return (
             getAirdropStatus(),

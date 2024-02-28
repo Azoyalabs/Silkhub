@@ -128,4 +128,13 @@ contract IcoController is Ownable, IIcoController {
             icoToken.balanceOf(address(this))
         );
     }
+
+    function withdraw() public onlyOwner {
+        if (getIcoStatus() != IcoStatus.Closed) {
+            revert("Can only withdraw funds once Ico is finished");
+        }
+
+        (bool sent, bytes memory data) = owner().call{value: address(this).balance}("");
+        require(sent, "Failed to send Ether");
+    }
 }

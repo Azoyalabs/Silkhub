@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 
 interface IAirdrop {
     function getClaimableAmount(address target) external view returns (uint);
-    function isClaimable() external view returns (bool);
+    //function isClaimable() external view returns (bool);
 
     function claim() external;
 
