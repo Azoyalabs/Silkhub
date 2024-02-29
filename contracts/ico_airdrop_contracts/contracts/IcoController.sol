@@ -3,6 +3,8 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/interfaces/IERC20Metadata.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -27,12 +29,14 @@ contract IcoController is Ownable, IIcoController {
 
     error IcoNotStarted(uint256 startTime, uint256 currentTime);
     error IcoClosed(uint256 endTime, uint256 currentTime);
-
+    error CannotBuyZeroTokens();
+    error NotEnoughTokensRemainingToFillOrder(uint256 remaining, uint256 requested);
+    error WithdrawalOnlyAfterEndIco();
 
     constructor(address _icoToken, uint256 _tokenPriceInNative, uint256 _startTime, uint256 _endTime) Ownable(msg.sender) {
         icoToken = ERC20(_icoToken);
         tokenPriceInNative = _tokenPriceInNative;
-        oneTokenInWei = uint(10) ** IERC20Metadata(_icoToken).decimals();
+        //oneTokenInWei = uint(10) ** IERC20Metadata(_icoToken).decimals();
         startTime = _startTime;
         endTime = _endTime;
     }
@@ -54,7 +58,7 @@ contract IcoController is Ownable, IIcoController {
 
     /// Get number of tokens that can be bought from a given amount of native tokens
     function getNumberTokensFromValue(uint256 value) public view returns (uint256) {
-        return value * oneTokenInWei / tokenPriceInNative;
+        return value / tokenPriceInNative;
     }
 
     /// Get number of tokens that can be bought from a given amount of native tokens
@@ -72,9 +76,9 @@ contract IcoController is Ownable, IIcoController {
 
     function buy() public payable {
         // can only buy if ICO has started and is not over 
-        if (block.timestamp >= startTime) {
+        if (block.timestamp < startTime) {
             revert IcoNotStarted(startTime, block.timestamp);
-        } else if (block.timestamp < endTime) {
+        } else if (block.timestamp >= endTime) {
             revert IcoClosed(endTime, block.timestamp);
         }
 
@@ -84,17 +88,23 @@ contract IcoController is Ownable, IIcoController {
         uint256 amountOfTokensBuying = (msg.value).mul(oneTokenInWei).div(sale.tokenPriceInAVAX);
         */
 
-        uint256 amountOfTokensBuying = msg.value * oneTokenInWei / tokenPriceInNative;
+        //uint256 amountOfTokensBuying = msg.value * oneTokenInWei / tokenPriceInNative;
+        uint256 amountOfTokensBuying = getNumberTokensFromValue(msg.value);
+
+        if (amountOfTokensBuying == 0) {
+            revert CannotBuyZeroTokens();
+        }
 
         // check contract balance 
-        if (getTokensRemaining() >= amountOfTokensBuying) {
+        uint256 tokens_remaining = getTokensRemaining();
+        if (tokens_remaining >= amountOfTokensBuying) {
             // can transfer 
             icoToken.transfer(
                 msg.sender,
                 amountOfTokensBuying
             );
         } else {
-            revert("Not enough tokens remaining to fill order");
+            revert NotEnoughTokensRemainingToFillOrder(tokens_remaining, amountOfTokensBuying);
         }
     }
 
@@ -104,11 +114,16 @@ contract IcoController is Ownable, IIcoController {
             revert("Can only burn once Ico is finished");
         }
 
+        /*
         // send to 0 address
         icoToken.transfer(
             address(0),
             icoToken.balanceOf(address(this))
         );
+        */
+
+        // try to burn 
+        ERC20Burnable(address(icoToken)).burn(icoToken.balanceOf(address(this)));
     }
 
     /// Returns the following data: 
@@ -131,10 +146,14 @@ contract IcoController is Ownable, IIcoController {
 
     function withdraw() public onlyOwner {
         if (getIcoStatus() != IcoStatus.Closed) {
-            revert("Can only withdraw funds once Ico is finished");
+            revert WithdrawalOnlyAfterEndIco();
         }
 
-        (bool sent, bytes memory data) = owner().call{value: address(this).balance}("");
-        require(sent, "Failed to send Ether");
+        /*
+        (bool sent, bytes memory data) = payable(owner()).call{value: address(this).balance}("");
+        require(sent, "Failed to send Bitcoin");
+        */
+
+       payable(owner()).transfer(address(this).balance);
     }
 }
