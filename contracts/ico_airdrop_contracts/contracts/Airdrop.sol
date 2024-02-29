@@ -17,6 +17,7 @@ contract Airdrop is IAirdrop, Ownable {
     uint256 public startTime;
 
     uint256 public claimed;
+    uint256 public amountWhitelisted;
     mapping (address => uint) whitelist;
 
     error AirdropNotStarted(uint256 startTime, uint256 currentTime);
@@ -30,7 +31,15 @@ contract Airdrop is IAirdrop, Ownable {
 
 
     function setAllowance(address beneficiary, uint256 amount) external onlyOwner {
-           whitelist[beneficiary] = amount;
+        uint256 prev_amount = whitelist[beneficiary];
+
+        if (amount > prev_amount) {
+            amountWhitelisted += amount - prev_amount;            
+        } else {
+            amountWhitelisted -= prev_amount - amount;
+        }
+
+        whitelist[beneficiary] = amount;
     }
 
     function batchSetAllowance(address[] calldata beneficiaries, uint256[] calldata amounts) external onlyOwner {
@@ -79,14 +88,18 @@ contract Airdrop is IAirdrop, Ownable {
      * @return Airdrop status - AirdropStatus
      * @return token address - address
      * @return start time - uint256
-     * @return remaining to claim - uint256
+     * @return token balance - uint256
+     * @return amountWhitelisted - uint256
+     * @return amount claimed
      */
-    function getOverview() public view returns (AirdropStatus, address, uint256, uint256) {
+    function getOverview() public view returns (AirdropStatus, address, uint256, uint256, uint256, uint256) {
         return (
             getAirdropStatus(),
             address(airdropToken),
             startTime,
-            airdropToken.balanceOf(address(this))
+            airdropToken.balanceOf(address(this)),
+            amountWhitelisted,
+            claimed
         );
     }
 }

@@ -61,11 +61,11 @@ describe("Airdrop", function () {
                 [airdropContract.address, BigInt(5000)]
             );
 
-            let [status, token_address, start_time, tokens_remaining] = await airdropContract.read.getOverview();
+            let [status, token_address, start_time, token_balance, amount_whitelisted, amount_claimed] = await airdropContract.read.getOverview();
             
             expect(status).to.be.eq(0);
             expect(token_address.toLowerCase()).to.be.eq(tokenContract.address.toLowerCase());
-            expect(tokens_remaining).to.be.eq(BigInt(5000));
+            expect(token_balance).to.be.eq(BigInt(5000));
         })
 
         it("Set allowance", async function() {

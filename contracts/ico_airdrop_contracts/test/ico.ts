@@ -233,11 +233,7 @@ describe("Ico", function () {
             expect(
                 balance_admin_post_withdraw > balance_admin_pre_withdraw
             ).to.be.eq(true);
-            
-            
+                  
         })
     })
-
-
-
 });
