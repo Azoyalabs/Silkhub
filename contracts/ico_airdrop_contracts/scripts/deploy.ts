@@ -7,7 +7,8 @@ import * as viem from 'viem';
 import { mnemonicToAccount } from 'viem/accounts'
 
 
-import * as ContractData_ERC20_Mint from "../artifacts/contracts/ERC20_Mint.sol/ERC20_Mint.json";
+import * as contractData from "../artifacts/contracts/Airdrop.sol/Airdrop.json";
+
 
 //require('dotenv').config()
 
@@ -18,6 +19,8 @@ import { botanix_testnet } from "./commons";
 // changer ID dans le contrat
 const URI = "https://avalanche-hackathon-web.vercel.app/api/nfts/" 
 
+
+const TOKEN_ADDRESS = "0xc6306d597fe69c45f5f9f3a0855461142bc863cb"
 
 async function main() {
     dotenv.config();
@@ -42,12 +45,12 @@ async function main() {
     // deploy the token receiver 
     let txHash = await wallet.deployContract(
         {
-            abi: ContractData_ERC20_Mint.abi,
+            abi: contractData.abi,
             account,
             args: [
-                account.address, "Test ERC 20", "TERC", "500000000"
+                TOKEN_ADDRESS, BigInt(1713793250)
             ],
-            bytecode: ContractData_ERC20_Mint.bytecode as `0x{string}`
+            bytecode: contractData.bytecode as `0x{string}`
         }
     )
 
@@ -76,5 +79,5 @@ async function main() {
 
 
 main().then((res) => {
-    console.log(`Instantiation succeeded. Token at address: ${res.tokenAddress}`)
+    console.log(`Instantiation succeeded. Airdrop at address: ${res.tokenAddress}`)
 })

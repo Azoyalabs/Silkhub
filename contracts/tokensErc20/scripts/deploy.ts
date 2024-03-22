@@ -60,9 +60,6 @@ async function main() {
     );
 
     let tokenAddress = receipt!.contractAddress;
-    
-
-
 
     // perform verification after deployment? 
     // https://blog.chain.link/how-to-verify-smart-contract-on-etherscan-hardhat/

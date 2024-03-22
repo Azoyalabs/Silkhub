@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "esrun scripts/deploy.ts",
+    "batch_allow": "esrun scripts/batch_allow.ts",
+    "query_allowance": "esrun scripts/query_allowance.ts"
+
   },
   "author": "",
   "license": "ISC",
