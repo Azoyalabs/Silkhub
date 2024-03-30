@@ -381,7 +381,6 @@
 	</form>
 </TxForm>
 
-<!-- TODO: Missing links -->
 
 <section class="mt-12">
 	<h2>Additional Actions</h2>
