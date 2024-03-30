@@ -60,3 +60,12 @@ export const flyAndScale = (
         easing: cubicOut
     };
 };
+
+export function isEVMAddress(input: string) {
+    return /^0x[a-fA-F0-9]{40}$/.test(input);
+}
+
+
+export function dateToTimestamp(date: Date){
+    return BigInt(Math.round(date.getTime() / 1000));
+}

@@ -1,69 +1,39 @@
 <script lang="ts">
-	import { BoomBox } from 'lucide-svelte';
+	import { Button } from '$lib/components/ui/button';
+	import { ArrowUpRight, BoomBox } from 'lucide-svelte';
 
 	let heroFeatures = [
 		{
 			icon: BoomBox,
-			title: 'Sequence timing.',
-			content: 'Change the speaker’s timing by clicking and dragging the clips.'
+			title: 'Classic',
+			content: 'Create a regular ERC20 token with a fixed supply.'
 		},
 		{
 			icon: BoomBox,
-			title: 'Sequence timing.',
-			content: 'Change the speaker’s timing by clicking and dragging the clips.'
+			title: 'Mintable',
+			content: 'Create a token with a customisable minter.'
 		},
 		{
 			icon: BoomBox,
-			title: 'Sequence timing.',
-			content: 'Change the speaker’s timing by clicking and dragging the clips.'
+			title: 'Burnable',
+			content: 'Let holders or contracts burn their holdings.'
 		},
 		{
 			icon: BoomBox,
-			title: 'Sequence timing.',
-			content: 'Change the speaker’s timing by clicking and dragging the clips.'
-		}
-	];
-
-	let useCases = [
-		{
-			title: 'Classic Token',
-			content:
-				"Whether you're a content creator or a short story writer, our AI voice generator lets you design captivating audio experiences.",
-			tagline: 'Stories with emotion',
-			subline: 'Bring fictional characters to life'
-		},
-		{
-			title: 'Mint & Burn',
-			content:
-				"Whether you're a content creator or a short story writer, our AI voice generator lets you design captivating audio experiences.",
-			tagline: 'tagline',
-			subline: 'Bring fictional characters to life'
-		},
-		{
-			title: 'ERC1363 - Payable',
-			content:
-				"Whether you're a content creator or a short story writer, our AI voice generator lets you design captivating audio experiences.",
-			tagline: 'tagline',
-			subline: 'Bring fictional characters to life'
-		},
-		{
 			title: 'Pausable',
-			content:
-				"Whether you're a content creator or a short story writer, our AI voice generator lets you design captivating audio experiences.",
-			tagline: 'tagline',
-			subline: 'Bring fictional characters to life'
+			content: 'Add an emergency stop mechanism to your token contract.'
 		}
 	];
 </script>
 
-<div class="mx-auto mb-12 max-w-7xl">
+<div class="mx-auto my-12 max-w-7xl">
 	<div class="pb-6 mx-auto md:pb-12">
 		<h2 class="block font-sans text-5xl font-bold">
 			Launch Your <span class="text-primary">Token</span> with Silkhub
 		</h2>
 		<p class="block mt-6 font-serif text-xl font-normal text-muted-foreground">
-			Create new and unique synthetic voices in minutes using advanced Generative AI technology.
-			Create lifelike voices to use in videos, podcasts, audiobooks, and more.
+			Create and launch a new token with Silkhub. Choose from a variety of token types or mix &
+			match capabilities to your liking.
 		</p>
 	</div>
 	<div
@@ -83,62 +53,81 @@
 			</div>
 		{/each}
 	</div>
+	<div>
+		<Button href="/launchpad">Create a token</Button>
+	</div>
 </div>
-<div class="pt-32 pb-24 content sm:pb-32 sm:pt-40 lg:pb-40 lg:pt-52">
-	<div class="mx-auto max-w-7xl">
-		<div class="mb-12 sm:text-left md:mb-16 lg:mb-20">
-			<h2 class="block mb-6 font-sans text-5xl font-bold">
-				Natural Text to Speech &amp; AI Voice Generator
-			</h2>
-			<span class="block font-serif text-xl font-normal text-muted-foreground"
-				>Let your content go beyond text with our realistic AI voices. Generate high-quality spoken
-				audio in any voice, style, and language. Our AI voice generator is powered by an AI model
-				that renders human intonation and inflections with unrivaled fidelity, adjusting the
-				delivery based on context.</span
-			>
-		</div>
-		<div class="max-w-lg sm:mx-auto md:max-w-none">
-			<div class="grid grid-cols-1 gap-y-16 md:grid-cols-2 md:gap-x-12 md:gap-y-16">
-				{#each useCases as useCase}
-					<div class="relative flex flex-col gap-6 sm:flex-row md:flex-col lg:flex-row">
-						<div class="flex flex-col justify-between sm:min-w-0 sm:flex-1">
-							<div>
-								<a href="/use-cases/videos"
-									><h3 class="block mb-4 font-sans text-2xl font-bold">{useCase.title}</h3></a
-								>
-								<p class="block w-full font-serif text-base font-normal text-gray-500">
-									{useCase.content}
-								</p>
-							</div>
-							<div class="flex items-center mt-4 space-x-4">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 20 20"
-									fill="currentColor"
-									aria-hidden="true"
-									class="w-16 h-16 cursor-pointer hover:text-muted-foreground"
-									><path
-										fill-rule="evenodd"
-										d="M2 10a8 8 0 1116 0 8 8 0 01-16 0zm6.39-2.908a.75.75 0 01.766.027l3.5 2.25a.75.75 0 010 1.262l-3.5 2.25A.75.75 0 018 12.25v-4.5a.75.75 0 01.39-.658z"
-										clip-rule="evenodd"
-									></path></svg
-								>
-								<div class="flex flex-col space-y-2">
-									<span
-										class="block font-serif text-sm font-normal leading-none text-muted-foreground"
-										>{useCase.subline}</span
-									>
-									<h3
-										class="block font-sans text-base font-semibold leading-none text-gray-900 md:text-gray-100"
-									>
-										{useCase.tagline}
-									</h3>
-								</div>
-							</div>
-						</div>
-					</div>
-				{/each}
+
+<section class="p-8 mt-12 rounded-lg bg-primary text-background">
+	<div class="">
+		<div class="">
+			<div class="">
+				<h2 class="text-3xl font-bold lg:text-5xl">Ecosystem First</h2>
+			</div>
+			<p class="mt-10">
+				Build a DEX or an dApp on Botanix?<br /> Silkhub helps you keep track of launched token thanks
+				to our token list.
+			</p>
+
+			<div class="flex items-center gap-4">
+				<Button variant="outline" href="/tokens" class="mt-12 text-white"
+					>View Launched tokens
+
+					<ArrowUpRight class="w-5 h-5 ml-2"></ArrowUpRight>
+				</Button>
+				<Button variant="default" href="/api/tokens" class="mt-12 text-black border-black"
+					>Access token list
+
+					<ArrowUpRight class="w-5 h-5 ml-2"></ArrowUpRight>
+				</Button>
+
+				
 			</div>
 		</div>
 	</div>
+</section>
+
+<div class="mx-auto max-w-7xl sm:px-6 sm:py-32 lg:px-8">
+	<div
+		class="relative px-6 py-24 overflow-hidden text-center shadow-2xl isolate bg-background/50 sm:rounded-3xl sm:px-16"
+	>
+		<h2 class="max-w-2xl mx-auto text-3xl font-bold tracking-tight text-white sm:text-4xl">
+			Go the extra mile
+		</h2>
+		<p class="max-w-xl mx-auto mt-6 text-lg leading-8 text-gray-300">
+			Incididunt sint fugiat pariatur cupidatat consectetur sit cillum anim id veniam aliqua
+			proident excepteur commodo do ea.
+		</p>
+		<div class="flex items-center justify-center mt-10 gap-x-6">
+			<a
+				href="/airdrops/new"
+				class="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+				>Create an Airdrop</a
+			>
+			<a href="/sales/new" class="text-sm font-semibold leading-6 text-white"
+				>Create a Token Sale <span aria-hidden="true">→</span></a
+			>
+		</div>
+		<svg
+			viewBox="0 0 1024 1024"
+			class="absolute left-1/2 top-1/2 -z-10 h-[64rem] w-[64rem] -translate-x-1/2 [mask-image:radial-gradient(closest-side,white,transparent)]"
+			aria-hidden="true"
+		>
+			<circle
+				cx="512"
+				cy="512"
+				r="512"
+				fill="url(#827591b1-ce8c-4110-b064-7cb85a0b1217)"
+				fill-opacity="0.7"
+			/>
+			<defs>
+				<radialGradient id="827591b1-ce8c-4110-b064-7cb85a0b1217">
+					<stop stop-color="#7775D6" />
+					<stop offset="1" stop-color="#E935C1" />
+				</radialGradient>
+			</defs>
+		</svg>
+	</div>
 </div>
+
+<a href="https://dorahacks.io/hackathon/spiderhack/buidl">Built for the Spiderhack Hackathon</a>

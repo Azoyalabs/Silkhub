@@ -4,7 +4,7 @@ import { type Writable } from 'svelte/store';
 export enum LayoutLink {
     Home = '',
     Analytics = 'analytics',
-    // Profile = '#',
+    Socials = "socials"
 }
 export const CONTEXT_KEY = "LAYOUT";
 

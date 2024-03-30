@@ -3,13 +3,21 @@
 	import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi';
 
 	import { mainnet, arbitrum } from 'viem/chains';
-	import { reconnect, watchAccount } from '@wagmi/core';
+	import { getAccount, reconnect, watchAccount } from '@wagmi/core';
 	import { PUBLIC_WALLETCONNECT_PROJECT_ID } from '$env/static/public';
 	import { BOTANIX_TESTNET } from '$lib/constants/chain';
-	import { onMount } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import { createWalletClient, custom } from 'viem';
 	import { page } from '$app/stores';
 	import { DeleteIcon, XSquare, XSquareIcon } from 'lucide-svelte';
+	import Breadcrumb from '$lib/components/app/Breadcrumb/Breadcrumb.svelte';
+	import { USER_ACCOUNT } from '$lib/state';
+	import { WAGMI_CONFIG } from '$lib/configs/wagmi';
+	import extend from 'just-extend';
+	import { MetaTags } from 'svelte-meta-tags';
+
+	export let data;
+	$: metaTags = extend(true, {}, data.baseMetaTags, $page.data.pageMetaTags);
 
 	// 1. Define constants
 	const projectId = PUBLIC_WALLETCONNECT_PROJECT_ID;
@@ -24,51 +32,49 @@
 
 	const chains = [BOTANIX_TESTNET];
 
-	export const config = defaultWagmiConfig({
-		chains: chains, // required
-		projectId, // required
-		metadata, // required
-		enableWalletConnect: true, // Optional - true by default
-		enableInjected: true, // Optional - true by default
-		enableEIP6963: true, // Optional - true by default
-		enableCoinbase: true, // Optional - true by default
-		// ...wagmiOptions // Optional - Override createConfig parameters
-		enableEmail: true
-	});
+	setContext('account', USER_ACCOUNT);
 
 	onMount(async () => {
-		// TODO: We've got a subscription, now we need to store the actual account somewhere
-		const sub = watchAccount(config, {
+		const sub = watchAccount(WAGMI_CONFIG, {
 			onChange(account, prevaccount) {
 				console.log(`new account:`, account);
+				USER_ACCOUNT.set(account);
 			}
 		});
-		reconnect(config);
+
+		reconnect(WAGMI_CONFIG);
 
 		// 3. Create modal
 		const modal = createWeb3Modal({
-			wagmiConfig: config,
+			themeVariables: {
+				'--w3m-accent': 'rgb(250, 204, 21)'
+			},
+			wagmiConfig: WAGMI_CONFIG,
 			projectId,
+
 			enableAnalytics: true // Optional - defaults to your Cloud configuration
 		});
 	});
-	$page.url.href;
 </script>
 
-<!-- TODO: don't show again if closed -->
-<div class="relative hidden from-primary to-primary/80 bg-gradient-to-r lg:block">
-	<div class="py-2 text-sm text-center">
-		Always make sure the URL is {$page.url.origin}
-	</div>
-	<button class="absolute rounded-full right-2 top-2 hover:bg-white/30"> <XSquareIcon /> </button>
-</div>
+<MetaTags {...metaTags} />
+
+<span class="hero-gradient"></span>
+<div class="sticky top-0 z-10 h-0.5 bg-gradient-to-r from-primary to-primary/80"></div>
 <div class="relative mx-auto max-w-7xl">
 	<div
-		class="sticky top-0 z-10 w-full py-4 overflow-hidden backdrop-blur-sm"
+		class="sticky top-0.5 z-10 w-full overflow-hidden py-4 backdrop-blur-sm"
 		style="border-radius: var(--radius);"
 	>
 		<nav class="flex items-center justify-between px-12 mx-auto">
-			<a class="block text-2xl font-bold" href="/">
+			<a class="flex items-center text-2xl font-bold" href="/">
+				<img
+					src="/android-chrome-192x192.png"
+					width="32"
+					height="32"
+					alt="Silkhub Logo"
+					class="mr-3"
+				/>
 				SILK<span class="text-primary">HUB</span>
 			</a>
 
@@ -76,10 +82,11 @@
 		</nav>
 	</div>
 
-	<div class="mt-8">
-		<div class="p-12 rounded-lg">
-			<slot />
-		</div>
+	<div class="px-4 pt-8 pb-12 rounded-lg md:px-12">
+		{#if $page.url.pathname !== '/'}
+			<Breadcrumb url={$page.url} />
+		{/if}
+		<slot />
 	</div>
 </div>
 
@@ -137,7 +144,7 @@
 			</a>
 		</div>
 		<div class="mt-8 md:order-1 md:mt-0">
-			<p class="text-xs leading-5 text-center text-gray-500">
+			<p class="text-xs leading-5 text-center text-muted-foreground">
 				&copy; 2024 Silkhub, Inc. All rights reserved.
 			</p>
 		</div>
