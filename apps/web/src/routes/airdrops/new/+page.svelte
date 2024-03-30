@@ -69,7 +69,7 @@
 	const form = superForm(data.form, {
 		dataType: 'json',
 		validators: zodClient(airdropFormSchema),
-		onSubmit: async ({ form, formData, cancel, jsonData }) => {
+		onSubmit: async ({ formData, cancel, jsonData }) => {
 			const result = await validateForm({ update: false });
 			if (result.valid) {
 				step = Step.Transacting;

@@ -27,7 +27,14 @@
 	const account = getContext<Writable<GetAccountReturnType>>('account');
 
 	let claimStatus: readonly [boolean, bigint] | null = null;
-	let saleInfo = null;
+	let saleInfo: {
+		start: Date;
+		end: Date;
+		status: number;
+		unitPrice: bigint;
+		remaining: bigint;
+	} | null = null;
+
 	onMount(async () => {
 		account.subscribe(async (account) => {
 			if (account) {
@@ -40,11 +47,9 @@
 						functionName: 'getIsClaimableAndAmount',
 						args: [account.address!]
 					});
-					console.dir(claimStatus);
 				} else {
 					claimStatus = [false, BigInt(0)];
 				}
-				console.log(`sale: ${sale}`);
 
 				if (sale) {
 					const icoStatus = await publicClient!.readContract({
@@ -53,7 +58,27 @@
 						functionName: 'getIcoStatus',
 						args: []
 					});
-					console.dir(icoStatus);
+
+					const remaining = await publicClient!.readContract({
+						abi: Contracts.Sale.abi,
+						address: sale.contract as `0x${string}`,
+						functionName: 'getTokensRemaining',
+						args: []
+					});
+					const inWei = await publicClient!.readContract({
+						abi: Contracts.Sale.abi,
+						address: sale.contract as `0x${string}`,
+						functionName: 'oneTokenInWei',
+						args: []
+					});
+					saleInfo = {
+						start: new Date(sale.start_date!),
+						end: new Date(sale.end_date!),
+						status: icoStatus,
+						remaining,
+						unitPrice: inWei
+					};
+
 				}
 			} else {
 				claimStatus = [false, BigInt(0)];
@@ -64,7 +89,6 @@
 	async function claimAirdrop() {
 		const walletClient = await getWalletClient(WAGMI_CONFIG);
 		try {
-			console.log(`address: ${airdrop.contract}`);
 			const simulation = await simulateContract(WAGMI_CONFIG, {
 				abi: Contracts.Airdrop.abi,
 				address: airdrop.contract as `0x${string}`,
@@ -72,7 +96,6 @@
 				account: $account!.address,
 				args: []
 			});
-			console.dir(simulation);
 
 			const claim = await walletClient.writeContract({
 				abi: Contracts.Airdrop.abi,
@@ -81,7 +104,6 @@
 				args: []
 			});
 
-			console.dir(claim);
 		} catch (error) {
 			console.error(error);
 		}
@@ -107,7 +129,9 @@
 									{Number(claimStatus[1]) * Math.pow(10, -data.token.info.decimals)}
 									<span class="font-bold uppercase">{data.token.info.symbol}</span> to claim
 								</p>
-								<Button class="mt-4" disabled={claimStatus[1] === BigInt(0)} on:click={claimAirdrop}>Claim Airdrop</Button>
+								<Button class="mt-4" disabled={claimStatus[1] === BigInt(0)} on:click={claimAirdrop}
+									>Claim Airdrop</Button
+								>
 							</div>
 						{/if}
 					{:else}
@@ -117,11 +141,27 @@
 					<div>No Airdrop found</div>
 				{/if}
 			</Tabs.Content>
-			<Tabs.Content value="sale">
-
-				<div class="p-4">
-					No Token Sale found
-				</div>
+			<Tabs.Content value="sale" class="p-4">
+				{#if sale}
+					{#if saleInfo}
+						<div class="">
+							<div class="flex items-center justify-between text-xs text-muted-foreground">
+								<p>Start: {saleInfo.start.toLocaleString()}</p>
+								<p>End: {saleInfo.end.toLocaleString()}</p>
+							</div>
+							<p class="mt-4">
+								{Number(saleInfo.remaining) * Math.pow(10, -data.token.info.decimals)}
+								<span class="font-bold uppercase">{data.token.info.symbol}</span> remaining
+							</p>
+							
+							<Button class="mt-4" disabled={saleInfo.status !== 1}>Buy Token</Button>
+						</div>
+					{:else}
+						<div class="pulse">Querying</div>
+					{/if}
+				{:else}
+					<div>No Sale found</div>
+				{/if}
 			</Tabs.Content>
 		</Tabs.Root>
 	</div>

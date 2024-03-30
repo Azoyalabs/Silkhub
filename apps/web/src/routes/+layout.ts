@@ -19,7 +19,7 @@ export const load = (async ({ url }) => {
 			type: 'website',
 			url: new URL(url.pathname, url.origin).href,
 			locale: 'en_US',
-			title: 'Open Graph Title',
+			title: 'Home',
 			description: 'Silkhub is a Token Launchpad for the Spiderchain. Create your token, an airdrop or a Token sale without writing a line of code.',
 			siteName: 'Silkhub',
 			images: [

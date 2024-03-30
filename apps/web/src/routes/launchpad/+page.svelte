@@ -57,6 +57,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import TxForm, { Step } from '$lib/components/app/TxForm/TxForm.svelte';
 	import { Textarea } from '$lib/components/ui/textarea';
+	import { AVOCADOSWAP, BITZY } from '$lib/constants/dexLinks';
 
 	let step = Step.Input;
 
@@ -385,10 +386,10 @@
 <section class="mt-12">
 	<h2>Additional Actions</h2>
 	<div class="grid gap-4 mt-2 md:grid-cols-2">
-		<Button variant="outline">Create pool on Bitzy</Button>
-		<Button variant="outline">Create pool on Avocadoswap</Button>
-		<Button variant="outline">Create Airdrop</Button>
-		<Button variant="outline">Create Token Sale</Button>
+		<Button variant="outline" href="{BITZY.POOL}">Create pool on Bitzy</Button>
+		<Button variant="outline" href="{AVOCADOSWAP.POOL()}">Create pool on Avocadoswap</Button>
+		<Button variant="outline" href="/airdrops/new">Create Airdrop</Button>
+		<Button variant="outline" href="/sales/new">Create Token Sale</Button>
 	</div>
 </section>
 

@@ -37,7 +37,6 @@
 	onMount(async () => {
 		const sub = watchAccount(WAGMI_CONFIG, {
 			onChange(account, prevaccount) {
-				console.log(`new account:`, account);
 				USER_ACCOUNT.set(account);
 			}
 		});

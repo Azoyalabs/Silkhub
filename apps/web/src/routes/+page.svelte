@@ -80,8 +80,6 @@
 
 					<ArrowUpRight class="w-5 h-5 ml-2"></ArrowUpRight>
 				</Button>
-
-				
 			</div>
 		</div>
 	</div>
@@ -95,8 +93,7 @@
 			Go the extra mile
 		</h2>
 		<p class="max-w-xl mx-auto mt-6 text-lg leading-8 text-gray-300">
-			Incididunt sint fugiat pariatur cupidatat consectetur sit cillum anim id veniam aliqua
-			proident excepteur commodo do ea.
+			Easily create airdrops and sales for the tokens you've launched using Silkhub
 		</p>
 		<div class="flex items-center justify-center mt-10 gap-x-6">
 			<a

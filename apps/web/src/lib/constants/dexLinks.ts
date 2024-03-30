@@ -5,6 +5,6 @@ export const BITZY = {
 
 // FIXME: missing links
 export const AVOCADOSWAP = {
-    POOL: (token: string) => '',
-    SWAP: (token: string) => ''
+    POOL: (token?: string) => '',
+    SWAP: (token?: string) => ''
 }

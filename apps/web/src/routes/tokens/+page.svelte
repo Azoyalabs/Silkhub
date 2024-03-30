@@ -17,18 +17,63 @@
 			>
 		</div>
 		<div class="mt-4">
-			<div
-				class="flex h-[250px] shrink-0 items-center justify-center rounded-md border border-dashed bg-background"
-			>
-				<div class="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
-					<div class="w-10 h-10 text-muted-foreground">
-						<MessageCircleQuestion class="w-10 h-10" />
-					</div>
+			{#if data.sales.length > 0}
+				<div class="grid gap-6 lg:grid-cols-3">
+					{#each data.sales as sale}
+						{@const startDate = new Date(sale.start_date)}
+						{@const endDate = new Date(sale.end_date)}
 
-					<h3 class="mt-4 text-lg font-medium">No Sale found</h3>
-					<p class="mt-2 mb-4 text-sm text-muted-foreground"></p>
+						{@const hasStarted = new Date() > startDate}
+						<a href="/tokens/{sale.token?.address}" class="group">
+							<Card.Root class="duration-300 group-hover:border-primary">
+								<Card.Content class="flex flex-col p-4">
+									<div class="flex items-center space-x-3">
+										<Avatar.Root>
+											<Avatar.Image src={sale.token.logo}></Avatar.Image>
+										</Avatar.Root>
+										<div>
+											<h5 class="text-lg font-medium lg:text-2xl">
+												{sale.token.name}
+											</h5>
+											<div class="text-xs font-semibold uppercase text-muted-foreground lg:text-sm">
+												{sale.token.symbol}
+											</div>
+										</div>
+									</div>
+									<div class="flex items-center justify-between mt-6">
+										<div>
+											{#if hasStarted}
+												<Badge class="uppercase">ongoing</Badge>
+											{:else}
+												<div class="text-sm">
+													Starts on {startDate.toLocaleDateString()}
+												</div>
+											{/if}
+										</div>
+
+										<div class="text-xs text-muted-foreground">
+											{sale.unit_price} BTC
+										</div>
+									</div>
+								</Card.Content>
+							</Card.Root>
+						</a>
+					{/each}
 				</div>
-			</div>
+			{:else}
+				<div
+					class="flex h-[250px] shrink-0 items-center justify-center rounded-md border border-dashed bg-background"
+				>
+					<div class="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
+						<div class="w-10 h-10 text-muted-foreground">
+							<MessageCircleQuestion class="w-10 h-10" />
+						</div>
+
+						<h3 class="mt-4 text-lg font-medium">No Sale found</h3>
+						<p class="mt-2 mb-4 text-sm text-muted-foreground"></p>
+					</div>
+				</div>
+			{/if}
 		</div>
 	</section>
 

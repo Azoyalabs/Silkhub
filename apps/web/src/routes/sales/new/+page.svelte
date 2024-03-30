@@ -20,7 +20,10 @@
 			start: z.string().refine((v) => v, { message: 'A valid date is required' }),
 			end: z.string().refine((v) => v, { message: 'A valid date is required' })
 		}),
-		price: z.coerce.number().default(0.001)
+		price: z.coerce.number().default(0.001),
+		supply: z.coerce.number().default(100_000),
+		contract: z.string(),
+
 	});
 
 	export type SaleFormSchema = typeof saleFormSchema;
@@ -59,6 +62,7 @@
 	import type { SaleCreationMessage } from '$lib/types/Messages';
 	import { Button } from '$lib/components/ui/button';
 	import { ArrowUpRight } from 'lucide-svelte';
+	import * as Contracts from '$lib/contracts';
 
 	export let data: PageData;
 	let step = Step.Input;
@@ -66,7 +70,7 @@
 	const form = superForm(data.form, {
 		dataType: 'json',
 		validators: zodClient(saleFormSchema),
-		onSubmit: async ({ formData, cancel }) => {
+		onSubmit: async ({ formData, cancel, jsonData }) => {
 			const result = await validateForm({ update: false });
 			if (result.valid) {
 				step = Step.Transacting;
@@ -77,7 +81,7 @@
 				const abi = Sale;
 
 				try {
-					const txHash = await walletClient.deployContract({
+					let txHash = await walletClient.deployContract({
 						abi: abi.abi,
 						args: [
 							$formData.address as `0x${string}`,
@@ -89,8 +93,23 @@
 					});
 
 					const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash });
-					console.dir(receipt);
-					formData.set('address', receipt.contractAddress as string);
+					const updatedFormData = {
+						...$formData,
+						contract: receipt.contractAddress as string
+					};
+
+					txHash = await walletClient.writeContract({
+						abi: Contracts.ERC20.ERC20.abi,
+						address: $formData.address as `0x${string}`,
+						functionName: 'transfer',
+						args: [receipt.contractAddress! as `0x${string}`, BigInt($formData.supply)]
+					});
+
+					await publicClient.waitForTransactionReceipt({ hash: txHash });
+
+					jsonData(updatedFormData);
+
+					// formData.set('address', receipt.contractAddress as string);
 				} catch (err) {
 					error = err as Error;
 					cancel();
@@ -110,7 +129,7 @@
 		dateStyle: 'long'
 	});
 
-	let value: DateValue | undefined;
+	let startValue: DateValue | undefined;
 	let tomorrow = today(getLocalTimeZone()).add({ days: 1 });
 
 	let rangeValue: DateRange | undefined = {
@@ -139,8 +158,7 @@
 <TxForm {step}>
 	<div slot="success">
 		<h1 class="text-xl font-bold">Success</h1>
-		<p class="text-muted-foreground">Your token has been created at</p>
-		<!-- TODO: this will overflow -->
+		<p class="text-muted-foreground">Your token sale has been created at</p>
 		<p class="mt-2 text-lg">{deployAddress}</p>
 
 		<Button href="/tokens/{tokenAddress}">View Sale <ArrowUpRight size="24" /></Button>
@@ -185,10 +203,16 @@
 						class={cn(
 							buttonVariants({ variant: 'outline' }),
 							'w-[280px] justify-start pl-4 text-left font-normal',
-							!value && 'text-muted-foreground'
+							!rangeStartValue && 'text-muted-foreground'
 						)}
 					>
-						{value ? df.format(value.toDate(getLocalTimeZone())) : 'Pick a date'}
+						{#if rangeValue?.start && rangeValue?.end}
+							{df.format(rangeValue?.start.toDate(getLocalTimeZone()))} - {df.format(
+								rangeValue?.end.toDate(getLocalTimeZone())
+							)}
+						{:else}
+							Pick a date
+						{/if}
 						<CalendarIcon class="w-4 h-4 ml-auto opacity-50" />
 					</Popover.Trigger>
 					<Popover.Content class="w-auto p-0" side="top">
@@ -220,6 +244,15 @@
 				<input hidden value={$formData.range.start} name={attrs.name} />
 				<input hidden value={$formData.range.end} name={attrs.name} />
 			</Form.Control>
+		</Form.Field>
+
+		<Form.Field name="supply" {form}>
+			<Form.Control let:attrs>
+				<Form.Label>Sale Supply</Form.Label>
+				<Input {...attrs} bind:value={$formData.supply} type="number" />
+			</Form.Control>
+			<Form.Description>How many tokens will be put on sale.</Form.Description>
+			<Form.FieldErrors />
 		</Form.Field>
 
 		<Form.Field name="price" {form}>
